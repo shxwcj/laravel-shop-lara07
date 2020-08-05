@@ -30,6 +30,15 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
+     * The attributes that should be with for arrays.
+     *
+     * @var array
+     */
+//    protected $with = [
+//        'addresses',
+//    ];
+
+    /**
      * The attributes that should be cast to native types.
      *
      * @var array

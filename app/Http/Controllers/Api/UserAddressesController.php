@@ -3,69 +3,67 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserAddressRequest;
 use App\Http\Resources\Resource;
 use App\Models\User;
+use App\Models\UserAddress;
 use Illuminate\Http\Request;
 
 class UserAddressesController extends Controller
 {
     /**
-     * 获取某用户的售货地址列表
+     * 获取售货地址列表
      * Display a listing of the resource.
      *
      * @param Request $request
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @throws \Exception
      */
     public function index(Request $request)
     {
-        //1
-//        return Resource::collection($request->user()->addresses);
-
-        //2
-        return Resource::collection(User::find(1)->addresses);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        if ($userId = $request->get('user')){
+            if ($user = User::query()->find($userId)){
+                return new Resource($user->addresses()->get());
+            }
+           throw new \Exception('没有此用户',404);
+        }
+        return Resource::collection(UserAddress::query()->latest()->paginate($request->get('per_page',15)));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param UserAddressRequest $request
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function store(Request $request)
+    public function store(UserAddressRequest $request)
     {
-        //
-    }
+        //1 需先拿去user信息
+//        return new Resource(
+//            $request->user()->addresses()->create($request->only([
+//                'province',
+//                'city',
+//                'district',
+//                'address',
+//                'zip',
+//                'contact_name',
+//                'contact_phone',
+//            ]))
+//        );
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
+        //2
+        return new Resource(
+            User::query()->find($request->get('user_id',1))->addresses()->create($request->only([
+                'province',
+                'city',
+                'district',
+                'address',
+                'zip',
+                'contact_name',
+                'contact_phone',
+            ]))
+        );
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
     }
 
     /**
@@ -77,7 +75,7 @@ class UserAddressesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+
     }
 
     /**

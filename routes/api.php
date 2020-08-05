@@ -18,6 +18,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('bindings')->namespace('Api')->group(function (){
+Route::group([
+    'namespace' => 'Api',
+],function (){
     Route::resource('user_addresses','UserAddressesController');
 });
